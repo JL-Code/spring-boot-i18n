@@ -1,0 +1,10 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+interface MessageSource
+note left : 消息源接口
+
+interface MessageSourceAware
+note left : 一个消息源感知接口
+
+@enduml

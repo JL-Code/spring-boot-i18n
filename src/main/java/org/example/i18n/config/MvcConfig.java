@@ -5,10 +5,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
+import java.time.Duration;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * <p>创建时间: 2024/3/21 </p>
@@ -24,10 +26,12 @@ public class MvcConfig implements WebMvcConfigurer {
      */
     @Bean
     public LocaleResolver localeResolver() {
-        SessionLocaleResolver slr = new SessionLocaleResolver();
+        CookieLocaleResolver clr = new CookieLocaleResolver("i18n_language_preference");
         // 设置默认地区为 US
-        slr.setDefaultLocale(Locale.US);
-        return slr;
+        clr.setDefaultLocale(Locale.CHINA);
+        clr.setDefaultTimeZone(TimeZone.getTimeZone("UTC"));
+        clr.setCookieMaxAge(Duration.ofDays(180));
+        return clr;
     }
 
     /**
@@ -40,8 +44,20 @@ public class MvcConfig implements WebMvcConfigurer {
         return lci;
     }
 
+    @Bean
+    public CookieLocaleChangeInterceptor cookieLocaleChangeInterceptor() {
+        return new CookieLocaleChangeInterceptor("i18n_language_preference");
+    }
+
+    @Bean
+    public AcceptLanguageLocaleChangeInterceptor acceptLanguageLocaleChangeInterceptor() {
+        return new AcceptLanguageLocaleChangeInterceptor();
+    }
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(localeChangeInterceptor());
+        registry.addInterceptor(cookieLocaleChangeInterceptor());
+        registry.addInterceptor(acceptLanguageLocaleChangeInterceptor());
     }
 }
